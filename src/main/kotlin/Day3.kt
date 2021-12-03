@@ -18,12 +18,12 @@ fun calculate(nums: ArrayList<String>, fst: Char, snd: Char) : Int {
 fun main() {
     val d = ArrayList<String>()
     File("src/main/resources/day3.in").forEachLine { d.add(it) }
-    var counts = IntArray(d[0].length)
+    val counts = IntArray(d[0].length)
     var ans1 = 0
     var ans2 = 0
     d.forEach { it.forEachIndexed { index, c -> if (c == '1') counts[index]++ } }
     for (i in counts) {
-        ans1 *= 2;
+        ans1 *= 2
         ans2 *= 2
         if ( i > d.size / 2 ) {
             ans1 += 1
