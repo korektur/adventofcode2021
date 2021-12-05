@@ -2,7 +2,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.util.Scanner
 
-val m = ArrayList<Int>()
 val f = File("src/main/resources/day4.in")
 val input = Scanner(FileInputStream(f))
 input.use {
