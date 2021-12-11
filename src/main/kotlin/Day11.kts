@@ -49,4 +49,3 @@ for (step in 1..1000) {
     }
     diff = 0
 }
-
