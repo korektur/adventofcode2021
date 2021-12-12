@@ -12,14 +12,8 @@ fun String.isLowerCase(): Boolean {
     return this.lowercase() == this
 }
 
-fun canVisitAgain(v: String): Boolean {
-    for (to in graph[v]!!) {
-        if (visited.getValue(to) == 0) {
-            return true
-        }
-    }
-
-    return false
+fun canVisitAgain(v: String, canVisitTwice: Boolean): Boolean {
+    return canVisitTwice || graph[v]!!.any { visited.getValue(it) == 0 }
 }
 
 //assuming there is no cycle consisting only from uppercase vertices
@@ -31,9 +25,10 @@ fun dfs(v: String, canVisitTwice: Boolean = false): Int {
     visited[v] = visited.getValue(v) + 1
     var ans = 0
     for (to in graph[v]!!) {
-        if (visited.getValue(to) == 0 || (!to.isLowerCase() && (canVisitTwice || canVisitAgain(to)))) {
+        val isLowerCase = to.isLowerCase()
+        if (visited.getValue(to) == 0 || (!isLowerCase && canVisitAgain(to, canVisitTwice))) {
             ans += dfs(to, canVisitTwice)
-        } else if (to.isLowerCase() && canVisitTwice && to != "start") {
+        } else if (isLowerCase && canVisitTwice && to != "start") {
             ans += dfs(to, false)
         }
     }
