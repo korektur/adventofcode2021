@@ -1,11 +1,8 @@
 import java.io.File
-import java.lang.Integer.max
-import java.lang.Integer.min
+import kotlin.math.abs
 
 val reader = File("src/main/resources/day13.in").bufferedReader()
-val dots = mutableSetOf<Pair<Int, Int>>()
-var maxX = 0
-var maxY = 0
+var dots = mutableSetOf<Pair<Int, Int>>()
 
 while (true) {
     val line = reader.readLine()
@@ -14,40 +11,23 @@ while (true) {
     }
 
     val (x, y) = line.split(",").map { it.toInt() }
-    maxX = max(x, maxX)
-    maxY = max(y, maxY)
     dots.add(x to y)
 }
 
-var n = maxX + 1
-var m = maxY + 1
-val matrix = Array(n) { BooleanArray(m) }
-dots.forEach { (x, y) -> matrix[x][y] = true }
-
-fun foldUp(d: Int) {
-    for (i in 0 until n) {
-        for (j in 1.. min(d, m - d - 1)) {
-            matrix[i][d - j] = matrix[i][d - j] || matrix[i][d + j]
-        }
-    }
-    m = d
+fun foldUp(p: Pair<Int, Int>, d: Int): Pair<Int, Int> {
+    return p.first to (d - abs(p.second - d))
 }
 
-fun foldLeft(d: Int) {
-    for (i in 1 .. min(d, n - d - 1)) {
-        for (j in 0 until m) {
-            matrix[d - i][j] = matrix[d - i][j] || matrix[d + i][j]
-
-        }
-    }
-    n = d
+fun foldLeft(p: Pair<Int, Int>, d: Int): Pair<Int, Int> {
+    return (d - abs(p.first - d)) to p.second
 }
 
 fun print() {
-    for (j in 0 until m) {
-        for (i in 0 until n) {
-            print(if (matrix[i][j]) '#' else '.')
-            print(" ")
+    val n = dots.maxOf { it.first }
+    val m = dots.maxOf { it.second }
+    for (j in 0..m) {
+        for (i in 0..n) {
+            print(if (dots.contains(i to j)) "# " else ". ")
         }
         println()
     }
@@ -56,21 +36,16 @@ fun print() {
 
 fun fold(line: String) {
     val (c, d) = line.split(" ", "=").takeLast(2)
-    if (c == "y") {
-        foldUp(d.toInt())
-    } else {
-        foldLeft(d.toInt())
-    }
+    dots = dots.map {
+        when (c) {
+            "y" -> foldUp(it, d.toInt())
+            else -> foldLeft(it, d.toInt())
+        }
+    }.toMutableSet()
 }
 
 fold(reader.readLine())
-var ans = 0
-for (j in 0 until m) {
-    for (i in 0 until n) {
-        if (matrix[i][j]) ans++
-    }
-}
-println(ans)
+println(dots.size)
 
 reader.forEachLine { fold(it) }
 print()
