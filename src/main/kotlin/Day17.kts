@@ -12,7 +12,6 @@ val maxY = input[4].toInt()
 
 var ans = Int.MIN_VALUE
 var ans2 = 0
-val ansSet = mutableSetOf<Pair<Int, Int>>()
 for (xV in 1..maxX) {
     for (yV in minY..5000) {
         var curX = 0
@@ -27,7 +26,6 @@ for (xV in 1..maxX) {
             if (curX in minX..maxX && curY in minY..maxY) {
                 ans = max(curAns, ans)
                 ans2++
-                ansSet.add(xV to yV)
                 break
             }
         }
