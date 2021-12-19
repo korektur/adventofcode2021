@@ -1,12 +1,16 @@
 import java.io.File
-import java.lang.Math.abs
-import java.lang.Math.max
+import kotlin.math.abs
+import kotlin.math.max
 
-data class Scanner(val id: Int, val beacons: MutableList<IntArray>, val coords: IntArray = intArrayOf(0, 0, 0)) {
+data class Scanner(
+    val id: Int,
+    val beacons: MutableList<MutableList<Int>>,
+    val coords: IntArray = intArrayOf(0, 0, 0)
+) {
 
 }
 
-val beacons = mutableSetOf<IntArray>()
+val beacons = mutableSetOf<MutableList<Int>>()
 
 fun areVisible(fst: Scanner, snd: Scanner): Boolean {
     for (xI in 0..2) {
@@ -26,11 +30,14 @@ fun areVisible(fst: Scanner, snd: Scanner): Boolean {
                                     val bx = x + beacon[xI] * xSign
                                     val by = y + beacon[yI] * ySign
                                     val bz = z + beacon[zI] * zSign
-                                    if (fst.beacons.any {
-                                            it.contentEquals(
-                                                intArrayOf(bx - fst.coords[0], by - fst.coords[1], bz - fst.coords[2])
+                                    if (fst.beacons.contains(
+                                            mutableListOf(
+                                                bx - fst.coords[0],
+                                                by - fst.coords[1],
+                                                bz - fst.coords[2]
                                             )
-                                        }) {
+                                        )
+                                    ) {
                                         cnt++
                                     }
                                 }
@@ -40,13 +47,14 @@ fun areVisible(fst: Scanner, snd: Scanner): Boolean {
                                     snd.coords[2] = z
                                     for (i in snd.beacons.indices) {
                                         val cur = snd.beacons[i]
-                                        snd.beacons[i] = intArrayOf(cur[xI] * xSign, cur[yI] * ySign, cur[zI] * zSign)
-                                        val realCoords = intArrayOf(
+                                        snd.beacons[i] =
+                                            mutableListOf(cur[xI] * xSign, cur[yI] * ySign, cur[zI] * zSign)
+                                        val realCoords = mutableListOf(
                                             snd.beacons[i][0] + x,
                                             snd.beacons[i][1] + y,
                                             snd.beacons[i][2] + z
                                         )
-                                        if (!beacons.any { it.contentEquals(realCoords) }) {
+                                        if (!beacons.contains(realCoords)) {
                                             beacons.add(realCoords)
                                         }
                                     }
@@ -66,6 +74,7 @@ fun areVisible(fst: Scanner, snd: Scanner): Boolean {
 fun main() {
     val scanners = mutableListOf<Scanner>()
     val reader = File("src/main/resources/day19.in").bufferedReader()
+    val unknownScanners = mutableSetOf<Int>()
     reader.use {
         var i = 0
         while (reader.ready()) {
@@ -73,10 +82,11 @@ fun main() {
             reader.readLine()
             var line = reader.readLine()
             while (line != null && line.isNotBlank()) {
-                scanner.beacons.add(line.split(",").map { it.toInt() }.toIntArray())
+                scanner.beacons.add(line.split(",").map { it.toInt() }.toMutableList())
                 line = reader.readLine()
             }
             scanners.add(scanner)
+            unknownScanners.add(scanner.id)
         }
     }
 
@@ -84,21 +94,17 @@ fun main() {
         beacons.add(beacon)
     }
 
-    while (true) {
-        val before = beacons.size
-        for (i in scanners.indices) {
-            if (i > 0 && scanners[i].coords.contentEquals(intArrayOf(0, 0, 0))) {
-                continue
+    val q = ArrayDeque<Int>()
+    q.add(0)
+    unknownScanners.remove(0)
+    while (q.isNotEmpty()) {
+        val i = q.removeFirst()
+
+        for (j in unknownScanners.toIntArray()) {
+            if (areVisible(scanners[i], scanners[j])) {
+                q.addLast(j)
+                unknownScanners.remove(scanners[j].id)
             }
-            for (j in scanners.indices.minus(i)) {
-                if (!scanners[j].coords.contentEquals(intArrayOf(0, 0, 0))) {
-                    continue
-                }
-                areVisible(scanners[i], scanners[j])
-            }
-        }
-        if (before == beacons.size) {
-            break
         }
     }
 
