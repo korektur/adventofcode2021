@@ -6,9 +6,7 @@ data class Scanner(
     val id: Int,
     val beacons: MutableList<MutableList<Int>>,
     val coords: IntArray = intArrayOf(0, 0, 0)
-) {
-
-}
+)
 
 val beacons = mutableSetOf<MutableList<Int>>()
 
@@ -30,14 +28,7 @@ fun areVisible(fst: Scanner, snd: Scanner): Boolean {
                                     val bx = x + beacon[xI] * xSign
                                     val by = y + beacon[yI] * ySign
                                     val bz = z + beacon[zI] * zSign
-                                    if (fst.beacons.contains(
-                                            mutableListOf(
-                                                bx,
-                                                by,
-                                                bz
-                                            )
-                                        )
-                                    ) {
+                                    if (fst.beacons.contains(mutableListOf(bx, by, bz))) {
                                         cnt++
                                     }
                                 }
@@ -47,10 +38,9 @@ fun areVisible(fst: Scanner, snd: Scanner): Boolean {
                                     snd.coords[2] = z
                                     for (i in snd.beacons.indices) {
                                         val cur = snd.beacons[i]
-                                        snd.beacons[i] = mutableListOf(cur[xI] * xSign + x, cur[yI] * ySign + y, cur[zI] * zSign + z)
-                                        if (!beacons.contains(snd.beacons[i])) {
-                                            beacons.add(snd.beacons[i])
-                                        }
+                                        snd.beacons[i] =
+                                            mutableListOf(cur[xI] * xSign + x, cur[yI] * ySign + y, cur[zI] * zSign + z)
+                                        beacons.add(snd.beacons[i])
                                     }
                                     return true
                                 }
