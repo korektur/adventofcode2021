@@ -21,9 +21,9 @@ fun areVisible(fst: Scanner, snd: Scanner): Boolean {
                     for (zSign in sequenceOf(-1, 1)) {
                         for (beacon1 in fst.beacons.indices) {
                             for (beacon2 in snd.beacons.indices) {
-                                val x = fst.coords[0] + fst.beacons[beacon1][0] - snd.beacons[beacon2][xI] * xSign
-                                val y = fst.coords[1] + fst.beacons[beacon1][1] - snd.beacons[beacon2][yI] * ySign
-                                val z = fst.coords[2] + fst.beacons[beacon1][2] - snd.beacons[beacon2][zI] * zSign
+                                val x = fst.beacons[beacon1][0] - snd.beacons[beacon2][xI] * xSign
+                                val y = fst.beacons[beacon1][1] - snd.beacons[beacon2][yI] * ySign
+                                val z = fst.beacons[beacon1][2] - snd.beacons[beacon2][zI] * zSign
                                 var cnt = 0
 
                                 for (beacon in snd.beacons) {
@@ -32,9 +32,9 @@ fun areVisible(fst: Scanner, snd: Scanner): Boolean {
                                     val bz = z + beacon[zI] * zSign
                                     if (fst.beacons.contains(
                                             mutableListOf(
-                                                bx - fst.coords[0],
-                                                by - fst.coords[1],
-                                                bz - fst.coords[2]
+                                                bx,
+                                                by,
+                                                bz
                                             )
                                         )
                                     ) {
@@ -47,15 +47,9 @@ fun areVisible(fst: Scanner, snd: Scanner): Boolean {
                                     snd.coords[2] = z
                                     for (i in snd.beacons.indices) {
                                         val cur = snd.beacons[i]
-                                        snd.beacons[i] =
-                                            mutableListOf(cur[xI] * xSign, cur[yI] * ySign, cur[zI] * zSign)
-                                        val realCoords = mutableListOf(
-                                            snd.beacons[i][0] + x,
-                                            snd.beacons[i][1] + y,
-                                            snd.beacons[i][2] + z
-                                        )
-                                        if (!beacons.contains(realCoords)) {
-                                            beacons.add(realCoords)
+                                        snd.beacons[i] = mutableListOf(cur[xI] * xSign + x, cur[yI] * ySign + y, cur[zI] * zSign + z)
+                                        if (!beacons.contains(snd.beacons[i])) {
+                                            beacons.add(snd.beacons[i])
                                         }
                                     }
                                     return true
