@@ -4,11 +4,11 @@ import kotlin.math.max
 
 data class Scanner(
     val id: Int,
-    val beacons: MutableList<MutableList<Int>>,
-    val coords: IntArray = intArrayOf(0, 0, 0)
+    var beacons: MutableSet<List<Int>>,
+    @Suppress("ArrayInDataClass") val coords: IntArray = intArrayOf(0, 0, 0)
 )
 
-val beacons = mutableSetOf<MutableList<Int>>()
+val beacons = mutableSetOf<List<Int>>()
 
 fun areVisible(fst: Scanner, snd: Scanner): Boolean {
     for (xI in 0..2) {
@@ -17,31 +17,35 @@ fun areVisible(fst: Scanner, snd: Scanner): Boolean {
                 for (ySign in sequenceOf(-1, 1)) {
                     val zI = (0..2).minus(xI).minus(yI)[0]
                     for (zSign in sequenceOf(-1, 1)) {
-                        for (beacon1 in fst.beacons.indices) {
-                            for (beacon2 in snd.beacons.indices) {
-                                val x = fst.beacons[beacon1][0] - snd.beacons[beacon2][xI] * xSign
-                                val y = fst.beacons[beacon1][1] - snd.beacons[beacon2][yI] * ySign
-                                val z = fst.beacons[beacon1][2] - snd.beacons[beacon2][zI] * zSign
+                        for (beacon1 in fst.beacons) {
+                            for (beacon2 in snd.beacons) {
+                                val x = beacon1[0] - beacon2[xI] * xSign
+                                val y = beacon1[1] - beacon2[yI] * ySign
+                                val z = beacon1[2] - beacon2[zI] * zSign
                                 var cnt = 0
 
                                 for (beacon in snd.beacons) {
                                     val bx = x + beacon[xI] * xSign
                                     val by = y + beacon[yI] * ySign
                                     val bz = z + beacon[zI] * zSign
-                                    if (fst.beacons.contains(mutableListOf(bx, by, bz))) {
-                                        cnt++
+                                    if (fst.beacons.contains(listOf(bx, by, bz))) {
+                                        if (++cnt >= 12) {
+                                            break
+                                        }
                                     }
                                 }
                                 if (cnt >= 12) {
                                     snd.coords[0] = x
                                     snd.coords[1] = y
                                     snd.coords[2] = z
-                                    for (i in snd.beacons.indices) {
-                                        val cur = snd.beacons[i]
-                                        snd.beacons[i] =
-                                            mutableListOf(cur[xI] * xSign + x, cur[yI] * ySign + y, cur[zI] * zSign + z)
-                                        beacons.add(snd.beacons[i])
-                                    }
+                                    val newBeacons = snd.beacons
+                                        .map {
+                                            listOf(it[xI] * xSign + x, it[yI] * ySign + y, it[zI] * zSign + z)
+                                        }
+                                        .toMutableSet()
+                                    snd.beacons = newBeacons
+                                    newBeacons.forEach { beacons.add(it) }
+
                                     return true
                                 }
                             }
@@ -62,7 +66,7 @@ fun main() {
     reader.use {
         var i = 0
         while (reader.ready()) {
-            val scanner = Scanner(i++, mutableListOf())
+            val scanner = Scanner(i++, mutableSetOf())
             reader.readLine()
             var line = reader.readLine()
             while (line != null && line.isNotBlank()) {
