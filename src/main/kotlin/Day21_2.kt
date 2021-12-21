@@ -10,9 +10,7 @@ fun count(positions: IntArray, score: IntArray, player: Int): LongArray {
     if (score[1] >= 21) return longArrayOf(0, 1)
 
     val cacheKey = CacheKey(positions[0], positions[1], score[0], score[1], player)
-    if (cache.containsKey(cacheKey)) {
-        return cache[cacheKey]!!
-    }
+    cache[cacheKey]?.let { return it }
 
     val res = LongArray(2)
     for (outcome in outcomes) {
@@ -30,10 +28,10 @@ fun count(positions: IntArray, score: IntArray, player: Int): LongArray {
 }
 
 fun main() {
-    var positions = File("src/main/resources/day21.in").readLines()
+    val positions = File("src/main/resources/day21.in").readLines()
         .map { it.split(": ")[1].toInt() - 1 }
         .toIntArray()
 
-    val res = count(positions, intArrayOf(0, 0), player = 0)
+    val res = count(positions, intArrayOf(0, 0), 0)
     println(res.maxOrNull())
 }
