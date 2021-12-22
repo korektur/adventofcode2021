@@ -14,6 +14,7 @@ fun readStep(line: String): Step {
 
 fun main() {
     val steps = File("src/main/resources/day22.in").readLines()
+        .take(20)
         .map { readStep(it) }
         .toList()
     val d = Array(101) { Array(101) { BooleanArray(101) { false } } }
