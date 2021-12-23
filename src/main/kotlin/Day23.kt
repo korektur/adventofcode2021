@@ -115,7 +115,7 @@ fun main() {
     val rooms = Array(4) { IntArray(4) }
     val input = File("src/main/resources/day23_2.in").readLines()
     val hallSize = input[1].count { it == '.' }
-    var hall = IntArray(hallSize) { -1 }
+    val hall = IntArray(hallSize) { -1 }
 
     var roomId = 0
     for (i in input[2].indices) {
